@@ -5,7 +5,7 @@ DLPATH=http://www.lua.org/ftp
 
 COMPDIR=$(CURDIR)/compile
 OUTDIR=$(CURDIR)/out
-SRCDIR=$(CURDIR)/sources
+SRCDIR=$(CURDIR)/src
 CC=clang
 LD=clang
 
@@ -48,5 +48,5 @@ clean:
 remove: clean
 	rm -rf $(OUTDIR)
 
-pristine:
-	rm $(SRCDIR)/$(LUASRC)
+pristine: remove
+	-rm $(SRCDIR)/$(LUASRC)

@@ -4,16 +4,31 @@ LVER=5.3
 LREL=1
 DLPATH=http://www.lua.org/ftp
 DLCMD=curl
+COSTUM=costums/lua-t.costum
 
-include Makefile.inc
+LUASRC=lua-$(LVER).$(LREL).tar.gz
+
+COMPDIR=$(CURDIR)/compile
+PREFIX=$(CURDIR)/out
+DLDIR=$(CURDIR)/download
+LUAINC=$(PREFIX)/include
+
+all: $(PREFIX)/bin/lua
+
+include $(COSTUM)
 
 CC=clang
 LD=clang
 
+$(DLDIR):
+	mkdir -p $(DLDIR)
 
-$(COMPDIR)/$(LVER)/src: $(SRCDIR)/$(LUASRC)
+$(DLDIR)/$(LUASRC): $(DLDIR)
+	$(DLCMD) -o $(DLDIR)/$(LUASRC)   $(DLPATH)/$(LUASRC) 
+
+$(COMPDIR)/$(LVER)/src: $(DLDIR)/$(LUASRC)
 	mkdir -p $(COMPDIR)/$(LVER)
-	tar -xvzf $(SRCDIR)/$(LUASRC) -C $(COMPDIR)/$(LVER) --strip-components=1
+	tar -xvzf $(DLDIR)/$(LUASRC) -C $(COMPDIR)/$(LVER) --strip-components=1
 	patch -d $(COMPDIR)/$(LVER)/src/ -i $(CURDIR)/relocate-5.3.patch
 
 $(COMPDIR)/$(LVER)/src/lua: $(COMPDIR)/$(LVER)/src
@@ -21,28 +36,40 @@ $(COMPDIR)/$(LVER)/src/lua: $(COMPDIR)/$(LVER)/src
 		MYCFLAGS=" -g -fPIC " \
 		linux
 
-$(TDIR)/t.so: $(COMPDIR)/$(LVER)/src
-	$(MAKE) -C $(TDIR) -j 4 CC=$(CC) LD=$(LD) \
-		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
-		INCS="$(COMPDIR)/$(LVER)/src" t.so
-
-install: $(COMPDIR)/$(LVER)/src/lua
+$(PREFIX)/bin/lua: $(COMPDIR)/$(LVER)/src/lua
 	$(MAKE) -C $(COMPDIR)/$(LVER) CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		INSTALL_TOP="$(OUTDIR)" \
+		INSTALL_TOP="$(PREFIX)" \
 		install
-	$(MAKE) -C $(TDIR) CC=$(CC) LD=$(LD) \
+
+custom: $(PREFIX)/bin/lua
+	$(MAKE) CC=$(CC) LD=$(LD) \
+		DLDIR=$(DLDIR) \
+		DLCMD=$(DLCMD) \
 		LVER=$(LVER) \
 		MYCFLAGS=' -g' \
-		INCS="$(COMPDIR)/$(LVER)/src" \
-		PREFIX="$(OUTDIR)" install
+		LUAINC="$(LUAINC)" \
+		PREFIX="$(PREFIX)" costumbuild
+	$(MAKE) CC=$(CC) LD=$(LD) \
+		DLDIR=$(DLDIR) \
+		DLCMD=$(DLCMD) \
+		LVER=$(LVER) \
+		MYCFLAGS=' -g' \
+		LUAINC="$(LUAINC)" \
+		PREFIX="$(PREFIX)" costuminstall
 
 clean:
 	rm -rf $(COMPDIR)
+	$(MAKE) CC=$(CC) LD=$(LD) \
+		DLDIR=$(DLDIR) \
+		DLCMD=$(DLCMD) \
+		LVER=$(LVER) \
+		MYCFLAGS=' -g' \
+		LUAINC="$(LUAINC)" \
+		PREFIX="$(PREFIX)" costumclean
 
 remove: clean
-	rm -rf $(OUTDIR)
+	rm -rf $(PREFIX)
 
 pristine: remove
-	-rm -rf $(SRCDIR)
+	-rm -rf $(DLDIR)

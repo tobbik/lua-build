@@ -1,13 +1,11 @@
 # vim: ft=make ts=3 sw=3 st=3 sts=3 sta noet tw=80 list
 T_DIR=$(CURDIR)/../lua-t
 
-
 $(T_DIR)/src/t.so: $(LUAINC)
 	$(MAKE) -C $(T_DIR) -j 4 CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
 		MYCFLAGS=' -g' \
 		INCDIR="$(LUAINC)/"
-
 
 costumbuild: $(T_DIR)/src/t.so
 	$(MAKE) -C $(T_DIR) CC=$(CC) LD=$(LD) \

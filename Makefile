@@ -24,7 +24,7 @@ $(DLDIR):
 	mkdir -p $(DLDIR)
 
 $(DLDIR)/$(LUASRC): $(DLDIR)
-	$(DLCMD) -o $(DLDIR)/$(LUASRC)   $(DLPATH)/$(LUASRC) 
+	$(DLCMD) -o $(DLDIR)/$(LUASRC)   $(DLPATH)/$(LUASRC)
 
 $(COMPDIR)/$(LVER)/src: $(DLDIR)/$(LUASRC)
 	mkdir -p $(COMPDIR)/$(LVER)
@@ -42,7 +42,7 @@ $(PREFIX)/bin/lua: $(COMPDIR)/$(LVER)/src/lua
 		INSTALL_TOP="$(PREFIX)" \
 		install
 
-custom: $(PREFIX)/bin/lua
+costum: $(PREFIX)/bin/lua
 	$(MAKE) CC=$(CC) LD=$(LD) \
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \

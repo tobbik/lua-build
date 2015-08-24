@@ -6,7 +6,8 @@ $(T_DIR)/src/t.so: $(LUAINC)
 	$(MAKE) -C $(T_DIR) -j 4 CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
 		MYCFLAGS=' -g' \
-		INCDIR="$(LUAINC)/"
+		INCDIR="$(LUAINC)/" \
+		BUILD_EXAMPLE=0
 
 
 costumbuild: $(T_DIR)/src/t.so
@@ -21,6 +22,7 @@ costuminstall: $(T_DIR)/src/t.so
 		LVER=$(LVER) \
 		MYCFLAGS=' -g' \
 		INCDIR="$(LUAINC)" \
+		BUILD_EXAMPLE=0 \
 		PREFIX="$(PREFIX)" install
 
 costumclean:

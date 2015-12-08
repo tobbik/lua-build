@@ -1,7 +1,7 @@
 # vim: ft=make ts=3 sw=3 st=3 sts=3 sta noet tw=80 list
 
 LVER=5.3
-LREL=1
+LREL=2
 DLPATH=http://www.lua.org/ftp
 DLCMD=curl
 COSTUM=costums/lua-t.costum
@@ -17,10 +17,12 @@ all: $(PREFIX)/bin/lua
 
 include $(COSTUM)
 
-MYCFLAGS=" -O3"
+MYCFLAGS=" -g -O2"
 
 CC=clang
 LD=clang
+
+all: costuminstall
 
 $(DLDIR):
 	mkdir -p $(DLDIR)
@@ -51,13 +53,6 @@ costum: $(PREFIX)/bin/lua
 		LVER=$(LVER) \
 		MYCFLAGS=$(MYCFLAGS) \
 		LUAINC="$(LUAINC)" \
-		PREFIX="$(PREFIX)" costumbuild
-	$(MAKE) CC=$(CC) LD=$(LD) \
-		DLDIR=$(DLDIR) \
-		DLCMD=$(DLCMD) \
-		LVER=$(LVER) \
-		MYCFLAGS=$(MYCFLAGS) \
-		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costuminstall
 
 clean:
@@ -71,7 +66,9 @@ clean:
 		PREFIX="$(PREFIX)" costumclean
 
 remove: clean
+	$(MAKE) clean
 	rm -rf $(PREFIX)
 
 pristine: remove
+	$(MAKE) remove
 	-rm -rf $(DLDIR)

@@ -17,6 +17,8 @@ all: $(PREFIX)/bin/lua
 
 include $(COSTUM)
 
+MYCFLAGS=" -O3"
+
 CC=clang
 LD=clang
 
@@ -33,13 +35,13 @@ $(COMPDIR)/$(LVER)/src: $(DLDIR)/$(LUASRC)
 
 $(COMPDIR)/$(LVER)/src/lua: $(COMPDIR)/$(LVER)/src
 	$(MAKE) -C $(COMPDIR)/$(LVER) -j 4 CC=$(CC) LD=$(LD) \
-		MYCFLAGS=" -g -fPIC " \
+		MYCFLAGS=$(MYCFLAGS) \
 		linux
 
 $(PREFIX)/bin/lua: $(COMPDIR)/$(LVER)/src/lua
 	$(MAKE) -C $(COMPDIR)/$(LVER) CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		INSTALL_TOP="$(PREFIX)" \
+		INSTALL_TOP=$(PREFIX) \
 		install
 
 costum: $(PREFIX)/bin/lua
@@ -47,14 +49,14 @@ costum: $(PREFIX)/bin/lua
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costumbuild
 	$(MAKE) CC=$(CC) LD=$(LD) \
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costuminstall
 
@@ -64,7 +66,7 @@ clean:
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costumclean
 

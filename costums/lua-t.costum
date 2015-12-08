@@ -1,24 +1,26 @@
 # vim: ft=make ts=3 sw=3 st=3 sts=3 sta noet tw=80 list
 T_DIR=$(CURDIR)/../lua-t
 
+MYCFLAGS=" -O3 -g"
+
 $(T_DIR)/src/t.so: $(LUAINC)
 	$(MAKE) -C $(T_DIR) -j 4 CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		INCDIR="$(LUAINC)/" \
 		BUILD_EXAMPLE=0
 
 costumbuild: $(T_DIR)/src/t.so
 	$(MAKE) -C $(T_DIR) CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		INCDIR="$(LUAINC)" \
 		PREFIX="$(PREFIX)" all
 
 costuminstall: $(T_DIR)/src/t.so
 	$(MAKE) -C $(T_DIR) CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		INCDIR="$(LUAINC)" \
 		BUILD_EXAMPLE=0 \
 		PREFIX="$(PREFIX)" install
@@ -26,6 +28,12 @@ costuminstall: $(T_DIR)/src/t.so
 costumclean:
 	$(MAKE) -C $(T_DIR) CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		MYCFLAGS=' -g' \
+		MYCFLAGS=$(MYCFLAGS) \
 		INCDIR="$(LUAINC)" \
 		PREFIX="$(PREFIX)" clean
+
+costumtest:
+	$(MAKE) -C $(T_DIR) CC=$(CC) LD=$(LD) \
+		LVER=$(LVER) \
+		MYCFLAGS=$(MYCFLAGS) \
+		INCDIR="$(LUAINC)" test

@@ -1,7 +1,7 @@
 # vim: ft=make ts=3 sw=3 st=3 sts=3 sta noet tw=80 list
 
 LVER=5.3
-LREL=2
+LREL=3
 DLPATH=http://www.lua.org/ftp
 DLCMD=curl
 COSTUM=costums/lua-t.costum
@@ -17,7 +17,7 @@ all: $(PREFIX)/bin/lua
 
 include $(COSTUM)
 
-MYCFLAGS=" -g -O2"
+MYCFLAGS= -g -O2
 
 CC=clang
 LD=clang
@@ -37,7 +37,7 @@ $(COMPDIR)/$(LVER)/src: $(DLDIR)/$(LUASRC)
 
 $(COMPDIR)/$(LVER)/src/lua: $(COMPDIR)/$(LVER)/src
 	$(MAKE) -C $(COMPDIR)/$(LVER) -j 4 CC=$(CC) LD=$(LD) \
-		MYCFLAGS=$(MYCFLAGS) \
+		MYCFLAGS="$(MYCFLAGS)" \
 		linux
 
 $(PREFIX)/bin/lua: $(COMPDIR)/$(LVER)/src/lua
@@ -51,7 +51,7 @@ costum: $(PREFIX)/bin/lua
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
 		LVER=$(LVER) \
-		MYCFLAGS=$(MYCFLAGS) \
+		MYCFLAGS="$(MYCFLAGS)" \
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costuminstall
 
@@ -61,7 +61,7 @@ clean:
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
 		LVER=$(LVER) \
-		MYCFLAGS=$(MYCFLAGS) \
+		MYCFLAGS="$(MYCFLAGS)" \
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costumclean
 

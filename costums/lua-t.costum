@@ -6,7 +6,7 @@ MYCFLAGS=" -O3 -g"
 $(T_DIR)/src/t.so: $(LUAINC)
 	$(MAKE) -C $(T_DIR) -j 8 CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		MYCFLAGS=$(MYCFLAGS) \
+		MYCFLAGS="$(MYCFLAGS)" \
 		INCDIR="$(LUAINC)/" \
 		BUILD_EXAMPLE=0
 
@@ -20,7 +20,7 @@ costumbuild: $(T_DIR)/src/t.so
 costuminstall: $(T_DIR)/src/t.so
 	$(MAKE) -C $(T_DIR) CC=$(CC) LD=$(LD) \
 		LVER=$(LVER) \
-		MYCFLAGS=$(MYCFLAGS) \
+		MYCFLAGS="$(MYCFLAGS)" \
 		INCDIR="$(LUAINC)" \
 		BUILD_EXAMPLE=0 \
 		PREFIX="$(PREFIX)" install

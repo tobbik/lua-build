@@ -17,7 +17,7 @@ all: $(PREFIX)/bin/lua
 
 include $(COSTUM)
 
-MYCFLAGS= -g -O2
+MYCFLAGS= -g -O0
 
 CC=clang
 LD=clang
@@ -55,8 +55,18 @@ costum: $(PREFIX)/bin/lua
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costuminstall
 
+test: $(PREFIX)/bin/lua
+	$(MAKE) CC=$(CC) LD=$(LD) \
+		DLDIR=$(DLDIR) \
+		DLCMD=$(DLCMD) \
+		LVER=$(LVER) \
+		MYCFLAGS="$(MYCFLAGS)" \
+		LUAINC="$(LUAINC)" \
+		PREFIX="$(PREFIX)" costumtest
+
 clean:
 	rm -rf $(COMPDIR)
+	rm -rf $(PREFIX)
 	$(MAKE) CC=$(CC) LD=$(LD) \
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
@@ -65,10 +75,6 @@ clean:
 		LUAINC="$(LUAINC)" \
 		PREFIX="$(PREFIX)" costumclean
 
-remove: clean
-	$(MAKE) clean
-	rm -rf $(PREFIX)
-
 pristine: remove
-	$(MAKE) remove
+	$(MAKE) clean
 	-rm -rf $(DLDIR)

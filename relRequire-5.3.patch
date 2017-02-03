@@ -1,0 +1,30 @@
+diff -ruN patches/5.3.orig/src/loadlib.c patches/5.3/src/loadlib.c
+--- patches/5.3.orig/src/loadlib.c	2015-11-23 03:30:45.000000000 -0800
++++ patches/5.3/src/loadlib.c	2017-02-02 14:52:57.873261287 -0800
+@@ -430,11 +430,26 @@
+ }
+ 
+ 
++// find location of current file
++static void appendcurrentpath(lua_State *L, const char *pname ) {
++  lua_Debug ar;
++  lua_getstack( L, 2, &ar );
++  lua_getinfo( L, "S", &ar );
++  strrchr( ar.short_src, '/' )[1] = 0x00;
++  if (0 == strncmp(pname, "cpath", 5))
++    lua_pushfstring(L, ";%s/?.so", ar.short_src );
++  if (0 == strncmp(pname, "path", 4))
++    lua_pushfstring(L, ";%s/?.lua;%s/?/init.lua", ar.short_src, ar.short_src );
++  lua_concat(L, 2);
++}
++
++
+ static const char *findfile (lua_State *L, const char *name,
+                                            const char *pname,
+                                            const char *dirsep) {
+   const char *path;
+   lua_getfield(L, lua_upvalueindex(1), pname);
++  appendcurrentpath(L, pname);
+   path = lua_tostring(L, -1);
+   if (path == NULL)
+     luaL_error(L, "'package.%s' must be a string", pname);

@@ -9,6 +9,7 @@ COSTUM=costums/lua-t.costum
 LUASRC=lua-$(LVER).$(LREL).tar.gz
 
 COMPDIR=$(CURDIR)/compile
+PATCHDIR=$(CURDIR)/patches
 PREFIX=$(CURDIR)/out
 DLDIR=$(CURDIR)/download
 LUAINC=$(PREFIX)/include
@@ -34,6 +35,7 @@ $(COMPDIR)/$(LVER)/src: $(DLDIR)/$(LUASRC)
 	mkdir -p $(COMPDIR)/$(LVER)
 	tar -xvzf $(DLDIR)/$(LUASRC) -C $(COMPDIR)/$(LVER) --strip-components=1
 	patch -d $(COMPDIR)/$(LVER)/src/ -i $(CURDIR)/relocate-5.3.patch
+	patch --strip 3 -d $(COMPDIR)/$(LVER)/src/ -i $(CURDIR)/relRequire-5.3.patch
 
 $(COMPDIR)/$(LVER)/src/lua: $(COMPDIR)/$(LVER)/src
 	$(MAKE) -C $(COMPDIR)/$(LVER) -j 4 CC=$(CC) LD=$(LD) \
@@ -67,6 +69,7 @@ test: $(PREFIX)/bin/lua
 clean:
 	rm -rf $(COMPDIR)
 	rm -rf $(PREFIX)
+	rm $(PATCHDIR)/new.patch
 	$(MAKE) CC=$(CC) LD=$(LD) \
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
@@ -78,3 +81,12 @@ clean:
 pristine: remove
 	$(MAKE) clean
 	-rm -rf $(DLDIR)
+
+
+$(PATCHDIR)/$(LVER): $(DLDIR)/$(LUASRC)
+	mkdir -p $(PATCHDIR)/$(LVER)
+	tar -xvzf $(DLDIR)/$(LUASRC) -C $(PATCHDIR)/$(LVER) --strip-components=1
+	cp -avrp $(PATCHDIR)/$(LVER) $(PATCHDIR)/$(LVER).orig
+
+patch: $(PATCHDIR)/$(LVER)
+	diff -ruN patches/$(LVER).orig/src patches/$(LVER)/src > $(PATCHDIR)/new.patch

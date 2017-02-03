@@ -1,26 +1,26 @@
-diff -ru LUA53_org/src/loadlib.c LUA53/src/loadlib.c
---- LUA53_org/src/loadlib.c	2014-07-29 09:01:00.000000000 -0700
-+++ LUA53/src/loadlib.c	2014-09-29 10:07:55.138880823 -0700
-@@ -688,13 +688,27 @@
+diff -ruN 5.3.4.orig/src/loadlib.c 5.3.4/src/loadlib.c
+--- 5.3.4.orig/src/loadlib.c	2017-01-12 09:14:26.000000000 -0800
++++ 5.3.4/src/loadlib.c	2017-02-02 17:27:58.213822634 -0800
+@@ -295,13 +295,27 @@
    if (path == NULL)  /* no environment variable? */
-     path = getenv(envname2);  /* try alternative name */
+     path = getenv(envname);  /* try unversioned name */
    if (path == NULL || noenv(L))  /* no environment variable? */
 +#ifndef _WIN32
 +  {
 +    lua_getglobal(L, "_LUA_ROOT");
-+    luaL_gsub(L, def, LUA_ROOT, luaL_checkstring(L, -1) );
++    luaL_gsub(L, dft, LUA_ROOT, luaL_checkstring(L, -1) );
 +    lua_remove(L, -2); // remove LUA_ROOT
 +  }
 +#else
-     lua_pushstring(L, def);  /* use default */
+     lua_pushstring(L, dft);  /* use default */
 +#endif
    else {
      /* replace ";;" by ";AUXMARK;" and then AUXMARK by default path */
      path = luaL_gsub(L, path, LUA_PATH_SEP LUA_PATH_SEP,
                                LUA_PATH_SEP AUXMARK LUA_PATH_SEP);
--    luaL_gsub(L, path, AUXMARK, def);
--    lua_remove(L, -2);
-+    path = luaL_gsub(L, path, AUXMARK, def);
+-    luaL_gsub(L, path, AUXMARK, dft);
+-    lua_remove(L, -2); /* remove result from 1st 'gsub' */
++    path = luaL_gsub(L, path, AUXMARK, dft);
 +#ifndef _WIN32
 +    lua_getglobal(L, "LUA_ROOT");
 +    luaL_gsub(L, path, LUA_ROOT, luaL_checkstring(L, -1) );
@@ -30,10 +30,10 @@ diff -ru LUA53_org/src/loadlib.c LUA53/src/loadlib.c
 +    lua_remove(L, -2); // remove ;; -> AUXMARK path
    }
    setprogdir(L);
-   lua_setfield(L, -2, fieldname);
-diff -ru LUA53_org/src/lua.c LUA53/src/lua.c
---- LUA53_org/src/lua.c	2014-06-30 12:48:08.000000000 -0700
-+++ LUA53/src/lua.c	2014-09-29 10:12:40.479960849 -0700
+   lua_setfield(L, -3, fieldname);  /* package[fieldname] = path value */
+diff -ruN 5.3.4.orig/src/lua.c 5.3.4/src/lua.c
+--- 5.3.4.orig/src/lua.c	2017-01-12 09:14:26.000000000 -0800
++++ 5.3.4/src/lua.c	2017-02-02 17:30:48.910499604 -0800
 @@ -13,6 +13,7 @@
  #include <stdio.h>
  #include <stdlib.h>
@@ -42,7 +42,7 @@ diff -ru LUA53_org/src/lua.c LUA53/src/lua.c
  
  #include "lua.h"
  
-@@ -565,6 +566,10 @@
+@@ -568,6 +569,10 @@
      lua_pushboolean(L, 1);  /* signal for libraries to ignore env. vars. */
      lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
    }
@@ -53,10 +53,10 @@ diff -ru LUA53_org/src/lua.c LUA53/src/lua.c
    luaL_openlibs(L);  /* open standard libraries */
    createargtable(L, argv, argc, script);  /* create table 'arg' */
    if (!(args & has_E)) {  /* no option '-E'? */
-diff -ru LUA53_org/src/luaconf.h LUA53/src/luaconf.h
---- LUA53_org/src/luaconf.h	2014-07-24 12:33:29.000000000 -0700
-+++ LUA53/src/luaconf.h	2014-09-29 10:15:00.715459099 -0700
-@@ -188,7 +188,7 @@
+diff -ruN 5.3.4.orig/src/luaconf.h 5.3.4/src/luaconf.h
+--- 5.3.4.orig/src/luaconf.h	2016-12-22 05:08:50.000000000 -0800
++++ 5.3.4/src/luaconf.h	2017-02-02 17:31:33.090502270 -0800
+@@ -200,7 +200,7 @@
  
  #else			/* }{ */
  

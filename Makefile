@@ -1,12 +1,13 @@
 # vim: ft=make ts=3 sw=3 st=3 sts=3 sta noet tw=80 list
 
 LVER=5.3
-LREL=3
+LREL=4
+LRL=$(LVER).$(LREL)
 DLPATH=http://www.lua.org/ftp
 DLCMD=curl
 COSTUM=costums/lua-t.costum
 
-LUASRC=lua-$(LVER).$(LREL).tar.gz
+LUASRC=lua-$(LRL).tar.gz
 
 COMPDIR=$(CURDIR)/compile
 PATCHDIR=$(CURDIR)/patches
@@ -35,7 +36,6 @@ $(COMPDIR)/$(LVER)/src: $(DLDIR)/$(LUASRC)
 	mkdir -p $(COMPDIR)/$(LVER)
 	tar -xvzf $(DLDIR)/$(LUASRC) -C $(COMPDIR)/$(LVER) --strip-components=1
 	patch -d $(COMPDIR)/$(LVER)/src/ -i $(CURDIR)/relocate-5.3.patch
-	patch --strip 3 -d $(COMPDIR)/$(LVER)/src/ -i $(CURDIR)/relRequire-5.3.patch
 
 $(COMPDIR)/$(LVER)/src/lua: $(COMPDIR)/$(LVER)/src
 	$(MAKE) -C $(COMPDIR)/$(LVER) -j 4 CC=$(CC) LD=$(LD) \
@@ -67,9 +67,9 @@ test: $(PREFIX)/bin/lua
 		PREFIX="$(PREFIX)" costumtest
 
 clean:
-	rm -rf $(COMPDIR)
-	rm -rf $(PREFIX)
-	rm $(PATCHDIR)/new.patch
+	-rm -rf $(COMPDIR)
+	-rm -rf $(PREFIX)
+	-rm $(PATCHDIR)/new.patch
 	$(MAKE) CC=$(CC) LD=$(LD) \
 		DLDIR=$(DLDIR) \
 		DLCMD=$(DLCMD) \
@@ -83,10 +83,10 @@ pristine: remove
 	-rm -rf $(DLDIR)
 
 
-$(PATCHDIR)/$(LVER): $(DLDIR)/$(LUASRC)
-	mkdir -p $(PATCHDIR)/$(LVER)
-	tar -xvzf $(DLDIR)/$(LUASRC) -C $(PATCHDIR)/$(LVER) --strip-components=1
-	cp -avrp $(PATCHDIR)/$(LVER) $(PATCHDIR)/$(LVER).orig
+$(PATCHDIR)/$(LRL): $(DLDIR)/$(LUASRC)
+	mkdir -p $(PATCHDIR)/$(LRL)
+	tar -xvzf $(DLDIR)/$(LUASRC) -C $(PATCHDIR)/$(LRL) --strip-components=1
+	cp -avrp $(PATCHDIR)/$(LRL) $(PATCHDIR)/$(LRL).orig
 
-patch: $(PATCHDIR)/$(LVER)
-	diff -ruN patches/$(LVER).orig/src patches/$(LVER)/src > $(PATCHDIR)/new.patch
+patch: $(PATCHDIR)/$(LRL)
+	diff -ruN patches/$(LRL).orig/src patches/$(LRL)/src > $(PATCHDIR)/new.patch
